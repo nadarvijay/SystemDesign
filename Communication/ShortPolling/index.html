@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Short Polling</title>
+</head>
+
+<body>
+    <h1>Short Polling</h1>
+    <div id="data"></div>
+    <script>
+        async function getData() {
+            try {
+                const res = await fetch('http://127.0.0.1:5111/getData');
+                const json = await res.json();
+                const dataElement = document.getElementById('data');
+                console.log(dataElement);
+                dataElement.innerHTML = json.data;
+            }
+            catch (e) {
+                console.error(e);
+            }
+        }
+
+        setInterval(() => {
+            getData();
+        }, 5000)
+        // have a reference to the interval and close the interval on destroy
+    </script>
+</body>
+
+</html>

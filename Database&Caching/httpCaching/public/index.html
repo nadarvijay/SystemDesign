@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Http Caching</title>
+</head>
+
+<body>
+    <div>
+        Getting from http caching
+    </div>
+    <div>
+        <img id="cachedImg" src="downArrow.gif" alt="downArrow">
+    </div>
+    <button onclick="newImage()">Fetch New Image</button>
+
+    <script>
+        function newImage() {
+            const randomString = Math.random().toString(36).substring(7);
+
+            const cachedImg = document.getElementById('cachedImg');
+            cachedImg.src = `downArrow.gif?${randomString}`;
+        }
+    </script>
+</body>
+
+</html>

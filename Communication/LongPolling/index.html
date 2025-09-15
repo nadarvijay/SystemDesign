@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Long Polling</title>
+</head>
+
+<body>
+    <h1>Long Polling</h1>
+    <h3 id="data"></h3>
+
+    <script>
+        async function getData(lastData) {
+            try {
+                const response = await fetch("http://127.0.0.1:5111/initialData?lastData=" + lastData);
+                const json = await response.json();
+                if (json) {
+                    const element = document.getElementById('data');
+                    element.innerHTML = json.data;
+                    getData(json.data);
+                }
+            }
+            catch (e) {
+                getData('');
+            }
+        }
+
+        getData('');
+    </script>
+</body>
+
+</html>

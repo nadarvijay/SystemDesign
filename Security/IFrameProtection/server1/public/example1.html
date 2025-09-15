@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IFrame example 1</title>
+</head>
+
+<body>
+    <h1>Example 1</h1>
+    <h3>Click hijacking using iframe (Parent website)</h3>
+
+    <iframe src="http://localhost:5011/iframe-website1" id="iframe-website"></iframe>
+
+    <button id="parentClick">
+        Click Me
+    </button>
+
+    <script>
+        document.getElementById('parentClick').addEventListener('click', () => {
+            window.alert("Parent Btn Clicked");
+        })
+    </script>
+
+    <style>
+        #iframe-website {
+            background-color: #ccc;
+            position: absolute;
+            opacity: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+    </style>
+
+</body>
+
+</html>

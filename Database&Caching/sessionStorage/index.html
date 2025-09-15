@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>session Storage</title>
+    <style>
+        .container {
+            display: flex;
+        }
+
+        .addBtn {
+            padding: 10px;
+            background-color: cadetblue;
+            margin-left: 20px;
+        }
+
+        .list-item {
+            display: flex;
+            width: 250px;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .removeBtn {
+            padding: 4px;
+            background-color: bisque;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <input type="text" id="task" placeholder="Enter Task">
+        <button id="addBtn" class="addBtn">Add</button>
+    </div>
+    <div id="task-display"></div>
+
+    <script>
+
+        // Assign a tab ID — used to identify tabs
+        let tabId = sessionStorage.getItem('tabId');
+        if (!tabId) {
+            // New tab (not duplicated)
+            tabId = crypto.randomUUID();
+            sessionStorage.setItem('tabId', tabId);
+        }
+
+        const addBtn = document.getElementById('addBtn');
+        let taskList = JSON.parse(sessionStorage.getItem('tasks')) || [];
+        render();
+
+        const channel = new BroadcastChannel('tasks');
+
+        addBtn.addEventListener('click', () => {
+            let task = document.getElementById('task');
+            if (task.value.trim() != "") {
+                taskList.push(task.value);
+                sessionStorage.setItem('tasks', JSON.stringify(taskList));
+                channel.postMessage({ type: 'addTask', taskValue: task.value, id: tabId });
+                task.value = "";
+                render();
+            }
+        })
+
+        function render() {
+            let taskDisplay = document.getElementById('task-display');
+            taskDisplay.innerHTML = "";
+            ulElement = document.createElement('ul');
+
+            taskList.forEach((task, index) => {
+                let listItem = document.createElement('li');
+                listItem.className = "list-item";
+
+                let taskDiv = document.createElement('div');
+                taskDiv.className = "task";
+                taskDiv.textContent = task;
+
+                let removeBtn = document.createElement('button');
+                removeBtn.textContent = "Remove";
+                removeBtn.className = "removeBtn";
+                removeBtn.addEventListener('click', () => {
+                    removeTaskByValue(task);
+                    channel.postMessage({ type: 'removeTask', taskValue: task, id: tabId });
+                });
+
+                listItem.appendChild(taskDiv);
+                listItem.appendChild(removeBtn);
+
+                ulElement.appendChild(listItem);
+            })
+
+            taskDisplay.appendChild(ulElement);
+        }
+
+        function removeTaskByValue(value) {
+            taskList = taskList.filter(task => task !== value);
+            sessionStorage.setItem('tasks', JSON.stringify(taskList));
+            render();
+        }
+
+        channel.onmessage = (event) => {
+            taskEvent = event.data;
+
+            if (taskEvent.id !== tabId) {
+                // Ignore unrelated tabs
+                return;
+            }
+
+            switch (taskEvent.type) {
+                case "addTask":
+                    taskList.push(taskEvent.taskValue);
+                    sessionStorage.setItem('tasks', JSON.stringify(taskList));
+                    render();
+                    break;
+
+                case "removeTask":
+                    removeTaskByValue(taskEvent.taskValue);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+    </script>
+</body>
+
+</html>

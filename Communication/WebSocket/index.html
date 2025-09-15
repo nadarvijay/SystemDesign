@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Websocket</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: aqua;
+        }
+
+        #messages {
+            width: 90%;
+            text-decoration: none;
+            list-style-type: none;
+        }
+
+        #messages>li {
+            padding: 0.5rem 1rem;
+            margin: 4px;
+        }
+
+        #messages>li:nth-child(odd) {
+            background: #efefef;
+        }
+
+        #form {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        #input {
+            width: 85%;
+            padding: 10px;
+            outline: none;
+        }
+
+        #send {
+            padding: 10px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>WebSocket</h1>
+    <form id="form">
+        <input id="input" type="text" placeholder="add your msg" autocomplete="off" /><button id="send">Send</button>
+    </form>
+    <ul id="messages">
+    </ul>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+
+        const socket = io();
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const messages = document.getElementById('messages');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (input.value) {
+                socket.emit('chat message', input.value);
+                input.value = '';
+            }
+        });
+
+        socket.on('chat message', (msg) => {
+            const li = document.createElement('li');
+            li.textContent = msg;
+            messages.appendChild(li);
+            window.scrollTo(0, document.body.scrollHeight);
+        })
+
+    </script>
+</body>
+
+</html>

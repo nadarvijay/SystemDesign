@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iframe iframe-website 1</title>
+</head>
+
+<body>
+    <h1>Iframe Website 1</h1>
+    <h3>Click hijacking using iframe (child website)</h3>
+    <button id="childClick" style="background-color: red;">
+        Click Me
+    </button>
+
+    <script>
+        document.getElementById('childClick').addEventListener('click', () => {
+            window.alert("Dangerous btn clicked");
+        })
+    </script>
+</body>
+
+</html>

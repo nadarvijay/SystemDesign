@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>localStorage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: white;
+            transition: all 0.5s;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Press toggle button to change theme</h1>
+    <button id="toggle-btn">Toggle Theme</button>
+
+    <script>
+        let mode = localStorage.getItem('mode') ?? 'light';
+        onLoad();
+
+        document.getElementById("toggle-btn").addEventListener('click', () => {
+            mode == 'light' ? setColor('#333') : setColor('white');
+            setMode();
+        })
+
+        window.addEventListener('storage', (event) => {  // to update on every tab when mode is changed on one tab
+            if (event.key === 'mode') {
+                mode = event.newValue;
+                onLoad();
+            }
+        })
+
+        function setColor(color) {
+            document.body.style.backgroundColor = color;
+        }
+
+        function setMode() {
+            mode = mode == 'light' ? 'dark' : 'light';
+            localStorage.setItem('mode', mode);
+        }
+
+        function onLoad() {
+            mode == 'light' ? setColor('white') : setColor('#333');
+        }
+    </script>
+</body>
+
+</html>

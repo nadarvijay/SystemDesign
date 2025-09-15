@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>indexedDB</title>
+    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+</head>
+
+<body>
+    <form id="taskForm">
+        <label>Enter TO DO :</label>
+        <input type="text" id="task" placeholder="task">
+        <button type="submit" id="save">Save</button>
+        <div id="displayTasks"></div>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => { // added everything inside this event listener so that it runs after the page has loaded/duplicated
+            var db = new Dexie('tasks');
+
+            db.version(1).stores({
+                tasks: '++id,task,status'
+            })
+
+            db.tasks.hook("creating", function (primKey, obj) {  // hook for creating
+                if (!obj.status) {
+                    obj.status = 0;  // 0 = not deleted, 1 = deleted
+                }
+            })
+
+            displayTasks();
+
+            const form = document.getElementById('taskForm').addEventListener('submit', (event) => {
+                event.preventDefault();
+                const task = document.getElementById('task').value;
+                db.tasks.add({ task }).then(() => { displayTasks() });
+                document.getElementById('task').value = '';
+            })
+
+            function displayTasks() {
+                db.tasks.where("status").equals(0).toArray().then((taskArray) => {
+                    const displayTasks = document.getElementById('displayTasks');
+                    displayTasks.innerHTML = '';
+
+                    taskArray.forEach((task) => {
+                        const taskElementWrapper = document.createElement('div');
+                        taskElementWrapper.className = 'taskElementWrapper';
+
+                        const taskElement = document.createElement('div');
+                        taskElement.textContent = task.task;
+
+                        const deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Delete';
+                        deleteButton.type = "button";            // prevent default form submission
+                        deleteButton.addEventListener('click', () => { deleteTask(task.id) })
+
+                        taskElementWrapper.appendChild(taskElement);
+                        taskElementWrapper.appendChild(deleteButton);
+
+                        displayTasks.appendChild(taskElementWrapper);
+                    })
+                })
+            }
+
+            function deleteTask(id) {
+                db.tasks.update(id, { status: 1 }).then(() => {
+                    displayTasks();
+                })
+            }
+        })
+
+    </script>
+</body>
+
+</html>

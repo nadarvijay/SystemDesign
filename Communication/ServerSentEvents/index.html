@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Server Sent Events</title>
+</head>
+
+<body>
+    <h1>Server Sent Events</h1>
+    <h3 id="messages"></h3>
+
+    <script>
+        const eventSource = new EventSource('/sse');
+
+        eventSource.onmessage = (event) => {
+            const sseData = event.data;
+            const msgElement = document.getElementById('messages');
+            msgElement.innerText = sseData;
+            // console.log(event.data);
+        }
+
+    </script>
+</body>
+
+</html>
